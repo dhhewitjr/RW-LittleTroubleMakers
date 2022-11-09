@@ -1,5 +1,5 @@
 # RW-LittleTroubleMakers
-## RimWorld 1.4 Ideologies Mod to let the Children get into more trouble
+## RimWorld 1.4 to let the Children from the BioTech DLC get into more trouble when doing learning activities.
 
 Teemo my Beemo
 
