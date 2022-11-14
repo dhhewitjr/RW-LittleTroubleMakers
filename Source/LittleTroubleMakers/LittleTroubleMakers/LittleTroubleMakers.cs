@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System;
+using RimWorld.Planet;
 
 namespace LittleTroubleMakers
 {
@@ -13,7 +14,7 @@ namespace LittleTroubleMakers
         [StaticConstructorOnStartup]
         static class TroubleMakers
         {
-            public static double m_fBaseRoll     = 1.0 / 6000;
+            public static double m_fBaseRoll     = 1.0 / 500_000;
             public static double m_fRaidRoll     = 1.0 / 2;
             public static double m_fGoodWillRoll = 1.0 / 2;
             public static int m_nGoodWillRange   = 10;
@@ -95,11 +96,16 @@ namespace LittleTroubleMakers
                     Log.Message("What is Null? --> raidParams " + (raidParams == null).ToString());
                     Log.Message("What is Null? --> raidIncident " + (raidIncident == null).ToString());
 
-                    Find.Storyteller.incidentQueue.Add(
-                        IncidentDefOf.RaidEnemy,
-                        Find.TickManager.TicksGame + 1000,
-                        raidParams
-                        );
+                    try
+                    {
+                        Find.Storyteller.incidentQueue.Add(
+                            IncidentDefOf.RaidEnemy,
+                            Find.TickManager.TicksGame + 1000,
+                            raidParams
+                            );
+                    }
+                    catch (Exception)
+                    { }
                 }
 
                 static void AdjustGoodWill(bool positive, ref Random rng)
@@ -115,7 +121,6 @@ namespace LittleTroubleMakers
                     Faction targetGoodWillChangeFaction = factions[factionIndx];
 
                     targetGoodWillChangeFaction.ChangeGoodwill_Debug(Faction.OfPlayer, goodWillDelta);
-
                     StandardLetter notifLetter = new StandardLetter();
                     notifLetter.Label = "Radio Talking";
                     notifLetter.Text = "A Child has prank called " + targetGoodWillChangeFaction.Name + "!\n";
@@ -124,6 +129,14 @@ namespace LittleTroubleMakers
                         "Luckily, they found it cute and increased their GoodWill by " + goodWillDelta :
                         // Negative Message
                         "They did not find it amusing... GoodWill has decreased by " + -1 * goodWillDelta;
+                    Find.LetterStack.ReceiveLetter(
+                        "Prank Call!",
+                        "A Child has prank called " + targetGoodWillChangeFaction.Name + "!\n" + (positive ?
+                            "Luckily, they found it cute and increased their GoodWill by " + goodWillDelta :
+                            "They did not find it amusing... GoodWill has decreased by " + -1 * goodWillDelta),
+                        positive ? LetterDefOf.PositiveEvent : LetterDefOf.NegativeEvent,
+                        new GlobalTargetInfo()
+                        );
                 }
             }
         }
